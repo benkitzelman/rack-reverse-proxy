@@ -24,7 +24,7 @@ module Rack
         end
       }
       if all_opts[:preserve_host]
-        headers['HOST'] = [uri.host, env['SERVER_PORT']].compact.map(&:to_s).join ':'
+        headers['HOST'] = [uri.host, (uri.port != 80 ? uri.port : nil)].compact.map(&:to_s).join ':'
       end
 
       session = Net::HTTP.new(uri.host, uri.port)

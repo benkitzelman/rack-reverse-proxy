@@ -17,6 +17,7 @@ describe Rack::ReverseProxy do
       Rack::ReverseProxy.new(dummy_app) do
         reverse_proxy '/test', 'http://example.com/', {:preserve_host => true}
         reverse_proxy '/2test', lambda{ |env| 'http://example.com/'}
+        reverse_proxy '/3test', 'http://example.com:4444/', {:preserve_host => true}
       end
     end
 
@@ -54,6 +55,12 @@ describe Rack::ReverseProxy do
       stub_request(:any, 'example.com/test/stuff')
       get '/test/stuff'
       a_request(:get, 'http://example.com/test/stuff').with(:headers => {"Host" => "example.com"}).should have_been_made
+    end
+
+    it "should set the Host header and port" do
+      stub_request(:any, 'example.com:4444/3test/stuff')
+      get '/3test/stuff'
+      a_request(:get, 'http://example.com:4444/3test/stuff').with(:headers => {"Host" => "example.com:4444"}).should have_been_made
     end
 
     describe "with preserve host turned off" do
